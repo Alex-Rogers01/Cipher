@@ -16,7 +16,7 @@ public class Config : SqlTableBase
     CValue = nValue;
   }
 
-  public static async Task<string> GetConfigValueAsync(string nKey) => ((Config)await new Config().SelectSingleAsync(nameof(CKey), nKey)).CValue;
+  public static async Task<string> GetConfigValueAsync(string nKey) => ((Config)await new Config().SelectSingleAsync(nameof(CKey), nKey))?.CValue;
 
   public override bool CheckColumnNames(List<string> nColumnNames, bool nThrowException = false)
   {

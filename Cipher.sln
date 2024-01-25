@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cipher.Discord", "Cipher.Di
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cipher.Games", "Cipher.Games\Cipher.Games.csproj", "{66DC7827-31F4-4B2A-9E15-8E30E0CC0CB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cipher.Tests", "Cipher.Tests\Cipher.Tests.csproj", "{CE6327FE-D18F-4C75-A5EB-B7AA66125094}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{66DC7827-31F4-4B2A-9E15-8E30E0CC0CB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66DC7827-31F4-4B2A-9E15-8E30E0CC0CB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66DC7827-31F4-4B2A-9E15-8E30E0CC0CB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE6327FE-D18F-4C75-A5EB-B7AA66125094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE6327FE-D18F-4C75-A5EB-B7AA66125094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE6327FE-D18F-4C75-A5EB-B7AA66125094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE6327FE-D18F-4C75-A5EB-B7AA66125094}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
