@@ -67,4 +67,11 @@ public abstract class SqlTableBase : ISqlTable
   }
 
   protected string GetTableName() => $"[{TableSchema}].[{TableName}]";
+
+  protected async Task<SqlConnection> GetOpenSQLConnection()
+  { 
+    SqlConnection conn = new SqlConnection(SqlManager.ConnectionString);
+    await conn.OpenAsync();
+    return conn;
+  }
 }

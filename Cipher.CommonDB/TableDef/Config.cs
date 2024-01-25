@@ -55,7 +55,7 @@ public class Config : SqlTableBase
     {
       string query = $"SELECT TOP(1) * FROM {GetTableName()}";
 
-      using(SqlConnection conn = new SqlConnection(SqlManager.ConnectionString))
+      using(SqlConnection conn = await GetOpenSQLConnection())
       { 
         using (SqlCommand cmd = new SqlCommand(query, conn))
         {

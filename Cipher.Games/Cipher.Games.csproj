@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CipherCommonDB\CipherCommonDB.csproj" />
-    <ProjectReference Include="..\CipherCore\CipherCore.csproj" />
+    <ProjectReference Include="..\Cipher.CommonDB\Cipher.CommonDB.csproj" />
+    <ProjectReference Include="..\Cipher.Core\Cipher.Core.csproj" />
   </ItemGroup>
 
 </Project>
