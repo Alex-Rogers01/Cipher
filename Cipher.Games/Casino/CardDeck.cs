@@ -25,10 +25,6 @@ public class CardDeck
     }
   }
 
-  public CardDeck() : this(1)
-  {  
-  }
-
   public Card DrawCard()
   { 
     Random r = new Random();
