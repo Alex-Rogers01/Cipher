@@ -11,4 +11,9 @@
     <ProjectReference Include="..\Cipher.Core\Cipher.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Casino\Slots\" />
+    <Folder Include="Casino\Poker\" />
+  </ItemGroup>
+
 </Project>
