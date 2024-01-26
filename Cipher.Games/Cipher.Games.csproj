@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Casino\Cards\**" />
+    <EmbeddedResource Remove="Casino\Cards\**" />
+    <None Remove="Casino\Cards\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Cipher.CommonDB\Cipher.CommonDB.csproj" />
     <ProjectReference Include="..\Cipher.Core\Cipher.Core.csproj" />
   </ItemGroup>
