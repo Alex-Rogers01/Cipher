@@ -20,6 +20,27 @@
   <ItemGroup>
     <Folder Include="Casino\Slots\" />
     <Folder Include="Casino\Poker\" />
+    <Folder Include="SocioSphere\Assets\Characters\Enemy\Mobs\" />
+    <Folder Include="SocioSphere\Assets\Characters\Enemy\MiniBosses\" />
+    <Folder Include="SocioSphere\Assets\Characters\Enemy\Bosses\" />
+    <Folder Include="SocioSphere\Assets\Characters\Enemy\Raids\" />
+    <Folder Include="SocioSphere\Assets\Items\Armour\Head\" />
+    <Folder Include="SocioSphere\Assets\Items\Armour\Chest\" />
+    <Folder Include="SocioSphere\Assets\Items\Armour\Legs\" />
+    <Folder Include="SocioSphere\Assets\Items\Armour\Boots\" />
+    <Folder Include="SocioSphere\Assets\Items\Consumables\Food\" />
+    <Folder Include="SocioSphere\Assets\Items\Consumables\Potions\" />
+    <Folder Include="SocioSphere\Assets\Items\Tools\" />
+    <Folder Include="SocioSphere\Assets\Items\Weapons\Melee\" />
+    <Folder Include="SocioSphere\Assets\Items\Weapons\Magic\" />
+    <Folder Include="SocioSphere\Assets\Items\Weapons\Ranged\" />
+    <Folder Include="SocioSphere\Assets\Locations\" />
+    <Folder Include="SQL\TableDef\SocioSphere\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Discord.Net" Version="3.13.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>
