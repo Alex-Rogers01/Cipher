@@ -33,6 +33,8 @@ public class Card
     get => (CardValue)Value;
   }
 
+  private byte[,] CardImage;
+
   public Card(CardSuit nSuit, int nValue)
   { 
     this.Suit = nSuit;
