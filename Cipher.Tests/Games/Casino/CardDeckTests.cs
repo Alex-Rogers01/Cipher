@@ -53,6 +53,7 @@ public class CardDeckTests : TestBase
   [DataRow(10)]
   [DataRow(0)]
   [DataRow(-1)]
+  [DataRow(-int.MaxValue)]
   public void TestCardDeckReset(int nNumberOfDecks)
   { 
     CardDeck _deck = new CardDeck(nNumberOfDecks);
