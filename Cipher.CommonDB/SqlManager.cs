@@ -1,7 +1,6 @@
 ﻿using System.Configuration;
-using System.Data.SqlClient;
 
-namespace CipherCommonDB;
+namespace Cipher.CommonDB;
 public static class SqlManager
 {
   public static string ConnectionString => ConfigurationManager.ConnectionStrings["DBConnStr"]?.ConnectionString;

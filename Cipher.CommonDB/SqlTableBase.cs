@@ -1,77 +1,147 @@
 ﻿using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 
-namespace CipherCommonDB;
+namespace Cipher.CommonDB;
 
-public abstract class SqlTableBase : ISqlTable
+public enum OrderByEnum
+{ 
+  ASC,
+  DESC
+}
+
+public abstract class SqlTableBase
 {
-  public string TableName { get; }
-  public string TableSchema { get; }
+  protected string TableName { get; set; }
+  protected string Schema { get; set; }
 
-  public SqlTableBase(string nTableName, string nTableSchema = "dbo")
-  {
-    TableName = nTableName;
-    TableSchema = nTableSchema;
+  protected SqlTableBase(string nTableName, string nSchema)
+  { 
+    this.TableName = nTableName;
+    this.Schema = nSchema;
   }
 
-  public virtual async Task<ISqlTable> SelectSingleAsync(string nParamName, object nValue) => throw new NotImplementedException();
-  public virtual async Task<ISqlTable> SelectSingleAsync(Dictionary<string, object> nParams) => throw new NotImplementedException();
-  public virtual async Task<ISqlTable> SelectSingleAsync(Dictionary<string, object> nParams, string nOrderByCol, OrderByEnum nOrderByType) => throw new NotImplementedException();
-  public virtual async Task<ISqlTable> SelectSingleAsync(Dictionary<string, object> nParams, Dictionary<string, OrderByEnum> nOrderBy) => throw new NotImplementedException();
-  public virtual async Task<IEnumerable<ISqlTable>> SelectMultipleAsync(Dictionary<string, object> nParams, int nMaxCol = 0) => throw new NotImplementedException();
-  public virtual async Task<IEnumerable<ISqlTable>> SelectMultipleAsync(Dictionary<string, object> nParams, string nOrderByCol, OrderByEnum nOrderByType, int nMaxCol = 0) => throw new NotImplementedException();
-  public virtual async Task<IEnumerable<ISqlTable>> SelectMultipleAsync(Dictionary<string, object> nParams, Dictionary<string, OrderByEnum> nOrderBy, int nMaxCol = 0) => throw new NotImplementedException();
-  public virtual async Task<bool> InsertDataAsync() => throw new NotImplementedException();
-  public virtual async Task<bool> InsertMultipleDataAsync(List<ISqlTable> nDataRows, SqlTransaction nTrans) => throw new NotImplementedException();
-  public virtual async Task<bool> InsertMultipleDataAsync(DataTable nDataTable, SqlTransaction nTrans) => throw new NotImplementedException();
-  public virtual async Task<bool> UpdateDataAsync() => throw new NotImplementedException();
-  public virtual async Task<bool> UpdateMultipleDataAsync(List<ISqlTable> nDataRows, SqlTransaction nTrans) => throw new NotImplementedException();
-  public virtual async Task<bool> UpdateMultipleDataAsync(DataTable nDataTable, SqlTransaction nTrans) => throw new NotImplementedException();
-  public virtual async Task<bool> DeleteAsync() => throw new NotImplementedException();
-  public virtual async Task<bool> DeleteMultipleAsync(List<ISqlTable> nDataRows) => throw new NotImplementedException();
-  public virtual async Task<bool> DeleteMultipleAsync(DataTable nDataTable) => throw new NotImplementedException();
-
-  public abstract bool CheckColumnNames(List<string> nColumnNames, bool nThrowException);
-
-  public virtual void AddWhereParameters(Dictionary<string, object> nParams, SqlCommand nCommand)
+  #region SELECT 
+  
+  public async Task SelectAllAsync() => await GetSingleEntryAsync(null!, null!);
+  public async Task GetSingleEntryAsync(string nParameterName, object nValue)
   {
-    if (nParams != null && nParams.Count > 0)
+    using(SqlConnection nConn = new SqlConnection(SqlManager.ConnectionString))
     {
-      CheckColumnNames(nParams.Keys.ToList(), true);
+      await nConn.OpenAsync();
+      await GetSingleEntryAsync(nParameterName, nValue, nConn);
+    }
+  }
+  public async Task GetSingleEntryAsync(string nParameterName, object nValue, SqlConnection nConn) => await GetSingleEntryAsync(new Dictionary<string, object>() { { nParameterName, nValue } }, nConn);
+  public async Task GetSingleEntryAsync(Dictionary<string, object> nParameters, SqlConnection nConn) => await GetSingleEntryAsync(nParameters, null!, nConn);
+  public async Task GetSingleEntryAsync(Dictionary<string, object> nParameters, string nOrderByColumn, OrderByEnum nOrderByType, SqlConnection nConn) => await GetSingleEntryAsync(nParameters, new Dictionary<string, OrderByEnum>() { { nOrderByColumn, nOrderByType } }, nConn);
+  public abstract Task GetSingleEntryAsync(Dictionary<string, object> nParameters, Dictionary<string, OrderByEnum> nOrderBy, SqlConnection nConn);
 
-      nCommand.CommandText += " WHERE";
+  #endregion SELECT
 
-      int counter = 0;
-      foreach (string key in nParams.Keys)
-      {
-        nCommand.CommandText += $" [{key}] = @param{counter}";
-        nCommand.Parameters.AddWithValue($"@param{counter++}", nParams[key]);
-      }
+
+  #region INSERT 
+
+  public async Task<bool> InsertSingleEntryAsync()
+  { 
+    using(SqlConnection nConn = new SqlConnection(SqlManager.ConnectionString))
+    { 
+      await nConn.OpenAsync();
+      return await InsertSingleEntryAsync(nConn);
+    }
+  }
+  public async Task<bool> InsertSingleEntryAsync(SqlConnection nConn) => await InsertSingleEntryAsync(this, nConn);
+  public async Task<bool> InsertSingleEntryAsync(SqlTableBase nData, SqlConnection nConn) => await InsertSingleEntryAsync(nData.CreateDataTable(), nConn);
+  public abstract Task<bool> InsertSingleEntryAsync(DataTable nTable, SqlConnection nConn);
+
+  public async Task<bool> InsertMultipleEntryAsync(DataTable nTable, SqlConnection nConn)
+  {
+    using (DbTransaction trans = await nConn.BeginTransactionAsync())
+    {
+      await InsertMultipleEntryAsync(nTable, nConn, trans);
+    }
+    return true;
+  }
+  public async Task<bool> InsertMultipleEntryAsync(List<SqlTableBase> nData)
+  { 
+    using(SqlConnection conn = new SqlConnection(SqlManager.ConnectionString))
+    {
+      await conn.OpenAsync();
+      return await InsertMultipleEntryAsync(nData, conn);
+    }
+  }
+  public async Task<bool> InsertMultipleEntryAsync(List<SqlTableBase> nData, SqlConnection nConn)
+  { 
+    using(DbTransaction trans = await nConn.BeginTransactionAsync())
+    { 
+      return await InsertMultipleEntryAsync(nData, nConn, trans);
     }
   }
 
-  public virtual void AddOrderByParameters(Dictionary<string, OrderByEnum> nOrderBy, SqlCommand nCommand)
+  public async Task<bool> InsertMultipleEntryAsync(List<SqlTableBase> nData, SqlConnection nConn, DbTransaction nTrans)
+  { 
+    DataTable tbl = new DataTable();
+    foreach(SqlTableBase table in nData)
+    { 
+      table.AddSelfToDataTable(tbl);
+    }
+
+    return await InsertMultipleEntryAsync(tbl, nConn, nTrans);
+  }
+
+  public async Task<bool> InsertMultipleEntryAsync(DataTable nTable, SqlConnection nConn, DbTransaction nTrans)
+  { 
+    foreach(DataRow row in nTable.Rows)
+    { 
+      if(!await InsertMultipleEntryAsync(row, nConn, nTrans))
+        return false;
+    }
+    return true;
+  }
+
+  public abstract Task<bool> InsertMultipleEntryAsync(DataRow nDataRow, SqlConnection nConn, DbTransaction nTrans);
+
+  #endregion INSERT
+
+  public abstract void AddSelfToDataTable(DataTable nTable);
+  public abstract DataTable CreateDataTable();
+
+
+  public abstract bool CheckColumnNames(List<string> nColumnNamesToCheck, bool nThrowException);
+
+  public virtual void AddOrderByParameters(Dictionary<string, OrderByEnum> nOrderBy, SqlCommand nCommand, bool nThrowException = false)
   {
     if (nOrderBy != null && nOrderBy.Count > 0)
     {
-      CheckColumnNames(nOrderBy.Keys.ToList(), true);
+      if(CheckColumnNames(nOrderBy.Keys.ToList(), nThrowException))
+      { 
+        List<string> orderByLst = new List<string>();
+        foreach (string key in nOrderBy.Keys)
+        {
+          orderByLst.Add($"[{key}] {Enum.GetName(typeof(OrderByEnum), nOrderBy[key])}");
+        }
 
-      List<string> orderByLst = new List<string>();
-      foreach (string key in nOrderBy.Keys)
-      {
-        orderByLst.Add($"[{key}] {Enum.GetName(typeof(OrderByEnum), nOrderBy[key])}");
+        nCommand.CommandText += $" ORDER BY {string.Join(',', orderByLst)}";
       }
+    }
+  }
+  public virtual void AddWhereParameters(Dictionary<string, object> nParams, SqlCommand nCommand, bool nThrowException = false)
+  {
+    if (nParams != null && nParams.Count > 0)
+    {
+      if(CheckColumnNames(nParams.Keys.ToList(), nThrowException))
+      { 
+        nCommand.CommandText += " WHERE";
 
-      nCommand.CommandText += $" ORDER BY {string.Join(',', orderByLst)}";
+        int counter = 0;
+        foreach (string key in nParams.Keys)
+        {
+          nCommand.CommandText += $" [{key}] = @param{counter}";
+          nCommand.Parameters.AddWithValue($"@param{counter++}", nParams[key]);
+        }
+      }
     }
   }
 
-  protected string GetTableName() => $"[{TableSchema}].[{TableName}]";
-
-  protected async Task<SqlConnection> GetOpenSQLConnection()
-  { 
-    SqlConnection conn = new SqlConnection(SqlManager.ConnectionString);
-    await conn.OpenAsync();
-    return conn;
-  }
+  protected string GetTableName() => $"{this.Schema}.{this.TableName}";
 }
